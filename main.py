@@ -7,12 +7,17 @@ client = OpenAI(
 
 messages = [{
     'role': 'system',
-    'content': 'Recommend one dinner dish that can be made with the ingredients provided by the user, and explain the recipe.'
+    'content': 'You are a helpful interview assistant. If you are given type of interview(ex: soccer club, AI graduate school), \
+                you say "OK" and you are ready to start the interview about given type. \
+                And then whenever I ask you a question, you will ask the one interview question. \
+                If I reply to your question, you will evaluate my answer(rating: 1점 ~ 5점) and give me the feedback. \
+                And you must reply in Korean. \
+                '
 }]
 
 
 while True:
-    msg = input('user prompt: ')
+    msg = input('I\'m interview assistant. What type of interview do you want?: ')
 
     if msg.strip().lower() == 'q':
         break
