@@ -44,42 +44,53 @@ else:
                     2. 면접 관련 팁
                     3. 면접 일정 예약
                     4. 면접 일정 확인
-                    5. 나가기 """)
+                    5. 나가기
+                    """)
 
-        if ask.strip().lower() == 'y':
+        if ask.strip().lower() == '1':
+            messages.append({
+                'role': 'user',
+                'content': 'Give me one interview question.'
+            })
+
+            completion = client.chat.completions.create(
+                model="qwen/qwen3-14b:free",
+                messages=messages
+            )
+            messages.append(completion.choices[0].message)
+            print('Q.', completion.choices[0].message.content)
+
+            answer = input('A. ')
+
+            if answer.strip().lower() == 'q':
+                break
+
+            messages.append({
+                'role': 'user',
+                'content': answer
+            })
+
+            completion = client.chat.completions.create(
+                model="qwen/qwen3-14b:free",
+                messages=messages
+            )
+            messages.append(completion.choices[0].message)
+            print(completion.choices[0].message.content)
+        elif ask.strip().lower() == '2':
+            #TODO (이 블럭에서 코드 짜주세요., pass 지우셔도 됨.)
             pass
-        elif ask.strip().lower() == 'q':
+        elif ask.strip().lower() == '3':
+            #TODO
+            pass
+        elif ask.strip().lower() == '4':
+            #TODO
+            pass
+        elif ask.strip().lower() == '5':
+            print('Thank you for your time. Goodbye.')
             break
         else:
             continue
 
-        messages.append({
-            'role': 'user',
-            'content': 'Give me one interview question.'
-        })
-
-        completion = client.chat.completions.create(
-            model="qwen/qwen3-14b:free",
-            messages=messages
-        )
-        messages.append(completion.choices[0].message)
-        print('Q.', completion.choices[0].message.content)
-
-        answer = input('A. ')
-
-        if answer.strip().lower() == 'q':
-            break
-
-        messages.append({
-            'role': 'user',
-            'content': answer
-        })
-
-        completion = client.chat.completions.create(
-            model="qwen/qwen3-14b:free",
-            messages=messages
-        )
-        messages.append(completion.choices[0].message)
-        print(completion.choices[0].message.content)
+        
 
 
