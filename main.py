@@ -17,7 +17,7 @@ messages = [{
                 '
 }]
 
-print('I\'m interview assistant. What type of interview do you want? ')
+print('저는 면접 어시스턴트입니다. 무슨 유형의 면접을 생각중이신가요? ')
 
 msg = input(': ')
 
@@ -38,7 +38,13 @@ else:
 
 
     while True:
-        ask = input('Want question? ')
+        ask = input("""
+                    시작하시겠습니까? 다음 번호 중 하나를 선택하세요.
+                    1. 모의면접
+                    2. 면접 관련 팁
+                    3. 면접 일정 예약
+                    4. 면접 일정 확인
+                    5. 나가기 """)
 
         if ask.strip().lower() == 'y':
             pass
