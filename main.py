@@ -47,6 +47,18 @@ else:
         else:
             continue
 
+        messages.append({
+            'role': 'user',
+            'content': 'Give me one interview question.'
+        })
+
+        completion = client.chat.completions.create(
+            model="qwen/qwen3-14b:free",
+            messages=messages
+        )
+        messages.append(completion.choices[0].message)
+        print('Q.', completion.choices[0].message.content)
+
         
 
 
