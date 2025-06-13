@@ -2,7 +2,7 @@ from openai import OpenAI
 
 client = OpenAI(
   base_url="https://openrouter.ai/api/v1",
-  api_key="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",
+  api_key="",
 )
 
 messages = [{
@@ -79,8 +79,17 @@ else:
             messages.append(completion.choices[0].message)
             print(completion.choices[0].message.content)
         elif ask.strip().lower() == '2':
-            #TODO (이 블럭에서 코드 짜주세요., pass 지우셔도 됨.)
-            pass
+            messages.append({
+                'role': 'user',
+                'content': 'Give me helpful tips for interview'
+            })
+
+            completion = client.chat.completions.create(
+                model="qwen/qwen3-14b:free",
+                messages=messages
+            )
+            messages.append(completion.choices[0].message)
+            print(completion.choices[0].message.content)
         elif ask.strip().lower() == '3':
             #TODO
             
