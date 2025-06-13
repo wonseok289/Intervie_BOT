@@ -36,7 +36,7 @@ class InterviewAssistant:
         """메인 윈도우 설정"""
         self.root = tk.Tk()
         self.root.title("면접 어시스턴트")
-        self.root.geometry("600x500")
+        self.root.geometry("600x900")
         self.root.configure(bg='#f0f0f0')
         
         # 메인 프레임
