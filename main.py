@@ -462,33 +462,99 @@ class InterviewAssistant:
 
     def view_schedule(self):
         """일정 확인"""
-        schedules = self.load_schedule()
+        self.schedules = self.load_schedule()
         
-        schedule_window = tk.Toplevel(self.root)
-        schedule_window.title("면접 일정 확인")
-        schedule_window.geometry("500x600")
-        schedule_window.configure(bg='#f0f0f0')
+        self.schedule_window = tk.Toplevel(self.root)
+        self.schedule_window.title("면접 일정 확인")
+        self.schedule_window.geometry("600x700")
+        self.schedule_window.configure(bg='#f0f0f0')
         
-        tk.Label(schedule_window, text="면접 일정 목록", 
+        tk.Label(self.schedule_window, text="면접 일정 목록", 
                 font=('Arial', 16, 'bold'), bg='#f0f0f0').pack(pady=10)
         
-        schedule_text = scrolledtext.ScrolledText(schedule_window, 
-                                                 font=('Arial', 11), 
-                                                 wrap=tk.WORD)
-        schedule_text.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+        # 스크롤 가능한 프레임 생성
+        canvas = tk.Canvas(self.schedule_window, bg='#f0f0f0')
+        scrollbar = ttk.Scrollbar(self.schedule_window, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = ttk.Frame(canvas)
         
-        if not schedules:
-            schedule_text.insert(tk.END, "저장된 면접 일정이 없습니다.")
-        else:
-            sorted_dates = sorted(schedules.keys())
-            for date in sorted_dates:
-                schedule_text.insert(tk.END, f"📅 {date}\n")
-                for i, detail in enumerate(schedules[date], 1):
-                    schedule_text.insert(tk.END, f"  {i}. {detail}\n")
-                schedule_text.insert(tk.END, "\n")
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
         
-        tk.Button(schedule_window, text="닫기", command=schedule_window.destroy,
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True, padx=20, pady=10)
+        scrollbar.pack(side="right", fill="y", pady=10)
+        
+        self.refresh_schedule_display()
+        
+        # 닫기 버튼
+        tk.Button(self.schedule_window, text="닫기", command=self.schedule_window.destroy,
                  font=('Arial', 12), bg='#F44336', fg='white').pack(pady=10)
+
+    def refresh_schedule_display(self):
+        """일정 표시 새로고침"""
+        # 기존 위젯들 제거
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        
+        if not self.schedules:
+            tk.Label(self.scrollable_frame, text="저장된 면접 일정이 없습니다.", 
+                    font=('Arial', 12), bg='#f0f0f0').pack(pady=20)
+        else:
+            sorted_dates = sorted(self.schedules.keys())
+            for date in sorted_dates:
+                # 날짜 프레임
+                date_frame = tk.Frame(self.scrollable_frame, bg='#e8e8e8', relief=tk.RAISED, bd=1)
+                date_frame.pack(fill=tk.X, padx=10, pady=5)
+                
+                tk.Label(date_frame, text=f"📅 {date}", 
+                        font=('Arial', 12, 'bold'), bg='#e8e8e8').pack(anchor=tk.W, padx=10, pady=5)
+                
+                # 각 일정 항목
+                for i, detail in enumerate(self.schedules[date]):
+                    item_frame = tk.Frame(self.scrollable_frame, bg='#f8f8f8', relief=tk.GROOVE, bd=1)
+                    item_frame.pack(fill=tk.X, padx=20, pady=2)
+                    
+                    # 일정 내용
+                    detail_label = tk.Label(item_frame, text=f"{i+1}. {detail}", 
+                                          font=('Arial', 11), bg='#f8f8f8', anchor=tk.W)
+                    detail_label.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10, pady=5)
+                    
+                    # 삭제 버튼
+                    delete_btn = tk.Button(item_frame, text="삭제", 
+                                         command=lambda d=date, idx=i: self.delete_schedule_item(d, idx),
+                                         font=('Arial', 10), bg='#FF5722', fg='white', width=6)
+                    delete_btn.pack(side=tk.RIGHT, padx=10, pady=5)
+
+    def delete_schedule_item(self, date, index):
+        """특정 일정 항목 삭제"""
+        if date not in self.schedules or index >= len(self.schedules[date]):
+            return
+        
+        # 삭제할 항목 정보
+        item_to_delete = self.schedules[date][index]
+        
+        # 삭제 확인 다이얼로그
+        if messagebox.askyesno("삭제 확인", 
+                              f"다음 일정을 삭제하시겠습니까?\n\n날짜: {date}\n내용: {item_to_delete}"):
+            
+            # 해당 항목 삭제
+            self.schedules[date].pop(index)
+            
+            # 해당 날짜에 더 이상 일정이 없으면 날짜 자체를 삭제
+            if not self.schedules[date]:
+                del self.schedules[date]
+            
+            # JSON 파일에 저장
+            self.save_schedule(self.schedules)
+            
+            # 화면 새로고침
+            self.refresh_schedule_display()
+            
+            messagebox.showinfo("완료", "일정이 삭제되었습니다.")
 
     def load_schedule(self):
         """JSON 파일에서 일정 불러오기"""
