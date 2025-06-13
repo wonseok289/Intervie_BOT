@@ -66,12 +66,12 @@ else:
             # q를 누르면 종료
             if answer.strip().lower() == 'q':
                 break
-
+ 
             messages.append({
                 'role': 'user',
                 'content': answer
             })
-
+ 
             completion = client.chat.completions.create(
                 model="qwen/qwen3-14b:free",
                 messages=messages
