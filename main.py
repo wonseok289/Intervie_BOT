@@ -16,7 +16,7 @@ messages = [{
                 And you must reply in Korean. \
                 '
 }]
-
+ 
 print('저는 면접 어시스턴트입니다. 무슨 유형의 면접을 생각중이신가요? ')
 
 msg = input(': ')
